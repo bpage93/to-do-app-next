@@ -89,7 +89,7 @@ export default function LandingPage() {
                 >
                     {isLogin ? (
                         <>
-                            Don&apos;t have an account?{" "}
+                            Don&apos;t have an account?&nbsp;
                             <button
                                 type="button"
                                 onClick={() => setIsLogin(false)}
@@ -100,7 +100,7 @@ export default function LandingPage() {
                         </>
                     ) : (
                         <>
-                            Already have an account?{" "}
+                            Already have an account?&nbsp;
                             <button
                                 type="button"
                                 onClick={() => setIsLogin(true)}
