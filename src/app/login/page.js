@@ -9,6 +9,7 @@ import {
     TextField,
     Button,
     Grid,
+    Box,
 } from "@mui/material";
 
 export default function LoginPage() {
@@ -25,10 +26,9 @@ export default function LoginPage() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // For now, accept any credentials
         localStorage.setItem(
             "user",
-            JSON.stringify({ loggedIn: true, name: email })
+            JSON.stringify({ loggedIn: true, name: email, email })
         );
         router.push("/home");
     };
@@ -36,15 +36,15 @@ export default function LoginPage() {
     return (
         <Container
             maxWidth="sm"
-            className="min-h-screen flex items-center justify-center"
+            className="min-h-screen flex flex-col justify-center"
         >
-            <Paper elevation={4} className="p-8 rounded-2xl w-full">
+            <Paper elevation={4} className="p-8 rounded-2xl shadow-lg w-full">
                 <Typography
                     variant="h4"
                     component="h1"
                     className="text-center mb-6"
                 >
-                    🔐 Log In
+                    🔐 Login
                 </Typography>
 
                 <form onSubmit={handleSubmit}>
@@ -60,7 +60,7 @@ export default function LoginPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={8}>
                             <TextField
                                 label="Password"
                                 type="password"
@@ -71,14 +71,24 @@ export default function LoginPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={4} className="flex items-center">
                             <Button
                                 type="submit"
                                 variant="contained"
                                 color="primary"
                                 fullWidth
                             >
-                                Log In
+                                Login
+                            </Button>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                fullWidth
+                                onClick={() => router.push("/signpage")}
+                            >
+                                Sign Up
                             </Button>
                         </Grid>
                     </Grid>

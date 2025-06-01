@@ -11,13 +11,12 @@ import {
     Grid,
 } from "@mui/material";
 
-export default function SignupPage() {
+export default function Signpage() {
     const router = useRouter();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    // If user is already logged in, send them straight to /home
     useEffect(() => {
         const stored = localStorage.getItem("user");
         if (stored && JSON.parse(stored).loggedIn) {
@@ -27,7 +26,6 @@ export default function SignupPage() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // For now, accept any credentials; in a real app you’d call an API.
         localStorage.setItem(
             "user",
             JSON.stringify({ loggedIn: true, name, email })
@@ -96,23 +94,6 @@ export default function SignupPage() {
                         </Grid>
                     </Grid>
                 </form>
-
-                <Typography
-                    variant="body2"
-                    className="text-center mt-6 text-gray-500"
-                >
-                    Already have an account?&nbsp;
-                    <a
-                        href="/login"
-                        className="text-blue-600 underline"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            router.push("/login");
-                        }}
-                    >
-                        Log In
-                    </a>
-                </Typography>
             </Paper>
         </Container>
     );
