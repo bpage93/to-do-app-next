@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Container, Grid } from "@mui/material";
+import { Container, Grid, Box } from "@mui/material";
 import { AnimatePresence } from "framer-motion";
 import Header from "@/components/Header";
 import TodoList from "@/components/TodoList";
@@ -43,9 +43,24 @@ export default function HomePage() {
     };
 
     return (
-        <>
+        <Box
+            sx={{
+                minHeight: "100vh",
+                display: "flex",
+                flexDirection: "column",
+                background:
+                    "linear-gradient(135deg, rgba(107,33,168,0.3), rgba(59,130,246,0.3))",
+                animation: "gradientShift 5s ease infinite",
+                "@keyframes gradientShift": {
+                    "0%": { backgroundPosition: "0% 50%" },
+                    "50%": { backgroundPosition: "100% 50%" },
+                    "100%": { backgroundPosition: "0% 50%" },
+                },
+                backgroundSize: "200% 200%",
+            }}
+        >
             <Header
-                userName="user"
+                userName="User"
                 onAddList={handleAddNewList}
                 onDeleteAll={handleDeleteAllLists}
                 onLogout={handleLogout}
@@ -80,6 +95,6 @@ export default function HomePage() {
                     </Grid>
                 </div>
             </Container>
-        </>
+        </Box>
     );
 }
