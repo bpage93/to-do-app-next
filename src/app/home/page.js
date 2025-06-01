@@ -10,38 +10,47 @@ import TodoList from "@/components/TodoList";
 export default function HomePage() {
     const [lists, setLists] = useState([]);
     const [completedCount, setCompletedCount] = useState(0);
+    const [completedTasks, setCompletedTasks] = useState([]);
     const router = useRouter();
 
+    // Add a new list
     const handleAddNewList = () => {
         setLists([...lists, Date.now()]);
     };
 
+    // Delete a single list
     const handleDeleteList = (idToDelete) => {
         setLists(lists.filter((id) => id !== idToDelete));
     };
 
+    // Delete all lists and reset notifications
     const handleDeleteAllLists = () => {
         setLists([]);
         setCompletedCount(0);
+        setCompletedTasks([]);
     };
 
+    // Logout clears user and navigates to the login page
     const handleLogout = () => {
         localStorage.removeItem("user");
-        router.push("/");
+        router.push("/login");
     };
 
-    const handleTaskComplete = () => {
+    // Track a completed task (text passed from TodoList)
+    const handleTaskComplete = (taskText) => {
         setCompletedCount((prev) => prev + 1);
+        setCompletedTasks((prev) => [...prev, taskText]);
     };
 
     return (
         <>
             <Header
-                userName="User"
+                userName="user"
                 onAddList={handleAddNewList}
                 onDeleteAll={handleDeleteAllLists}
                 onLogout={handleLogout}
                 completedCount={completedCount}
+                completedTasks={completedTasks}
             />
 
             <Container maxWidth="xl">
