@@ -68,10 +68,21 @@ export default function HomePage() {
                 completedTasks={completedTasks}
             />
 
-            <Container maxWidth="xl">
-                <div
-                    className="overflow-x-hidden overflow-y-auto pb-10"
-                    style={{ maxHeight: "calc(100vh - 150px)" }}
+            {/* Scrollable Container for Too Many Lists */}
+            <Container
+                maxWidth="xl"
+                sx={{
+                    flexGrow: 1,
+                    overflowY: "auto",
+                    py: 2,
+                    px: 2,
+                }}
+            >
+                <Box
+                    sx={{
+                        maxHeight: "calc(100vh - 150px)",
+                        overflowY: "auto",
+                    }}
                 >
                     <Grid container spacing={4}>
                         <AnimatePresence>
@@ -93,7 +104,7 @@ export default function HomePage() {
                             ))}
                         </AnimatePresence>
                     </Grid>
-                </div>
+                </Box>
             </Container>
         </Box>
     );
