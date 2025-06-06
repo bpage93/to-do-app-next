@@ -2,10 +2,11 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Container, Grid, Box } from "@mui/material";
-import { AnimatePresence } from "framer-motion";
+import { Box, Grid } from "@mui/material";
 import Header from "@/components/Header";
 import TodoList from "@/components/TodoList";
+import CalendarComponent from "@/components/Calendar";
+import { AnimatePresence } from "framer-motion";
 
 export default function HomePage() {
     const [lists, setLists] = useState([]);
@@ -45,18 +46,9 @@ export default function HomePage() {
     return (
         <Box
             sx={{
-                minHeight: "100vh",
                 display: "flex",
                 flexDirection: "column",
-                background:
-                    "linear-gradient(135deg, rgba(107,33,168,0.3), rgba(59,130,246,0.3))",
-                animation: "gradientShift 5s ease infinite",
-                "@keyframes gradientShift": {
-                    "0%": { backgroundPosition: "0% 50%" },
-                    "50%": { backgroundPosition: "100% 50%" },
-                    "100%": { backgroundPosition: "0% 50%" },
-                },
-                backgroundSize: "200% 200%",
+                minHeight: "100vh",
             }}
         >
             <Header
@@ -68,44 +60,47 @@ export default function HomePage() {
                 completedTasks={completedTasks}
             />
 
-            {/* Scrollable Container for Too Many Lists */}
-            <Container
-                maxWidth="xl"
-                sx={{
-                    flexGrow: 1,
-                    overflowY: "auto",
-                    py: 2,
-                    px: 2,
-                }}
-            >
-                <Box
-                    sx={{
-                        maxHeight: "calc(100vh - 150px)",
-                        overflowY: "auto",
-                    }}
-                >
-                    <Grid container spacing={4}>
-                        <AnimatePresence>
-                            {lists.map((id) => (
-                                <Grid
-                                    item
-                                    xs={12}
-                                    sm={6}
-                                    md={4}
-                                    lg={4}
-                                    key={id}
-                                >
-                                    <TodoList
-                                        listId={id}
-                                        onDeleteList={handleDeleteList}
-                                        onTaskComplete={handleTaskComplete}
-                                    />
-                                </Grid>
-                            ))}
-                        </AnimatePresence>
+            <Box sx={{ flexGrow: 1, p: 2 }}>
+                <Grid container spacing={2}>
+                    {/* Left: Calendar */}
+                    <Grid item xs={12} md={4} lg={3}>
+                        <CalendarComponent />
                     </Grid>
-                </Box>
-            </Container>
+
+                    {/* Right: To-Do Lists */}
+                    <Grid item xs={12} md={8} lg={9}>
+                        <Box
+                            sx={{
+                                maxHeight: "calc(100vh - 150px)",
+                                overflowY: "auto",
+                            }}
+                        >
+                            <Grid container spacing={4}>
+                                <AnimatePresence>
+                                    {lists.map((id) => (
+                                        <Grid
+                                            item
+                                            xs={12}
+                                            sm={6}
+                                            md={6}
+                                            lg={4}
+                                            key={id}
+                                        >
+                                            <TodoList
+                                                listId={id}
+                                                onDeleteList={handleDeleteList}
+                                                onTaskComplete={
+                                                    handleTaskComplete
+                                                }
+                                            />
+                                        </Grid>
+                                    ))}
+                                </AnimatePresence>
+                            </Grid>
+                        </Box>
+                    </Grid>
+                </Grid>
+            </Box>
         </Box>
     );
 }

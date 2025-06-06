@@ -12,6 +12,8 @@ import {
     Snackbar,
     Alert,
     Checkbox,
+    Box,
+    Stack,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import EditIcon from "@mui/icons-material/Edit";
@@ -33,29 +35,29 @@ export default function TodoList({ listId, onDeleteList, onTaskComplete }) {
     const [completedMessage, setCompletedMessage] = useState("");
 
     const handleAddTask = () => {
-        if (task.trim() === "") return;
-        setTasks([...tasks, { text: task, completed: false }]);
+        if (!task.trim()) return;
+        setTasks((prev) => [...prev, { text: task, completed: false }]);
         setTask("");
         setCompletedMessage("✅ Task added successfully!");
         setOpenToast(true);
     };
 
     const handleDeleteTask = (indexToDelete) => {
-        setTasks(tasks.filter((_, index) => index !== indexToDelete));
+        setTasks((prev) => prev.filter((_, index) => index !== indexToDelete));
     };
 
     const toggleTask = (index) => {
-        const newTasks = [...tasks];
-        newTasks[index].completed = !newTasks[index].completed;
-        setTasks(newTasks);
-
-        if (newTasks[index].completed) {
-            setCompletedMessage(
-                `✅ Task '${newTasks[index].text}' marked complete!`
+        setTasks((prev) => {
+            const updated = prev.map((item, i) =>
+                i === index ? { ...item, completed: !item.completed } : item
             );
-            setOpenToast(true);
-            onTaskComplete?.(newTasks[index].text);
-        }
+            if (updated[index].completed) {
+                setCompletedMessage(`🎉 '${updated[index].text}' completed!`);
+                setOpenToast(true);
+                onTaskComplete?.(updated[index].text);
+            }
+            return updated;
+        });
     };
 
     const filteredTasks = tasks.filter(FILTERS[filter]);
@@ -69,128 +71,185 @@ export default function TodoList({ listId, onDeleteList, onTaskComplete }) {
             transition={{ duration: 0.3 }}
         >
             <Paper
-                className="mb-8 p-8 rounded-2xl shadow-lg bg-gray-50"
-                elevation={3}
+                sx={{
+                    mb: 4,
+                    p: 3,
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    backgroundColor: "#fafafa",
+                }}
             >
-                <div className="flex items-center justify-between mb-4">
-                    {isEditingTitle ? (
+                <Stack spacing={2}>
+                    {/* Title and Delete List */}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        {isEditingTitle ? (
+                            <TextField
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                size="small"
+                                sx={{ flexGrow: 1 }}
+                            />
+                        ) : (
+                            <Typography
+                                variant="h6"
+                                noWrap
+                                sx={{ flexGrow: 1 }}
+                            >
+                                📝 {title}
+                            </Typography>
+                        )}
+                        <Box>
+                            <IconButton
+                                onClick={() =>
+                                    setIsEditingTitle((prev) => !prev)
+                                }
+                            >
+                                {isEditingTitle ? <SaveIcon /> : <EditIcon />}
+                            </IconButton>
+                            <Button
+                                variant="outlined"
+                                color="error"
+                                size="small"
+                                onClick={() => onDeleteList(listId)}
+                                sx={{ ml: 1 }}
+                            >
+                                Delete List
+                            </Button>
+                        </Box>
+                    </Box>
+
+                    {/* Add Task Input */}
+                    <Box sx={{ display: "flex", gap: 2 }}>
                         <TextField
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            size="small"
-                            className="w-full max-w-sm"
-                        />
-                    ) : (
-                        <Typography
-                            variant="h6"
-                            className="truncate max-w-[75%]"
-                        >
-                            📝 {title}
-                        </Typography>
-                    )}
-                    <div className="flex gap-2">
-                        <IconButton
-                            onClick={() => setIsEditingTitle((prev) => !prev)}
-                        >
-                            {isEditingTitle ? <SaveIcon /> : <EditIcon />}
-                        </IconButton>
-                        <Button
+                            fullWidth
+                            label="Add a new task"
                             variant="outlined"
-                            color="error"
-                            onClick={() => onDeleteList(listId)}
+                            size="small"
+                            value={task}
+                            onChange={(e) => setTask(e.target.value)}
+                            onKeyDown={(e) =>
+                                e.key === "Enter" && handleAddTask()
+                            }
+                        />
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleAddTask}
                         >
-                            Delete List
+                            Add
                         </Button>
-                    </div>
-                </div>
+                    </Box>
 
-                {/* Task Input */}
-                <div className="flex flex-col sm:flex-row gap-4 mb-6">
-                    <TextField
-                        fullWidth
-                        label="Add a new task"
-                        variant="outlined"
-                        value={task}
-                        onChange={(e) => setTask(e.target.value)}
-                    />
-                    <Button
-                        className="min-w-[150px]"
-                        variant="contained"
-                        color="primary"
-                        onClick={handleAddTask}
+                    {/* Filter Buttons */}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            gap: 1,
+                        }}
                     >
-                        ➕ Add Task
-                    </Button>
-                </div>
-
-                {/* Filter Buttons */}
-                <div className="flex justify-center gap-4 mb-6">
-                    <Button
-                        variant={filter === "all" ? "contained" : "outlined"}
-                        onClick={() => setFilter("all")}
-                    >
-                        All
-                    </Button>
-                    <Button
-                        variant={filter === "active" ? "contained" : "outlined"}
-                        onClick={() => setFilter("active")}
-                    >
-                        Active
-                    </Button>
-                    <Button
-                        variant={
-                            filter === "completed" ? "contained" : "outlined"
-                        }
-                        onClick={() => setFilter("completed")}
-                    >
-                        Completed
-                    </Button>
-                </div>
-
-                <Divider className="mb-6" />
-
-                {/* Tasks */}
-                <Grid container spacing={3}>
-                    <AnimatePresence>
-                        {filteredTasks.map((item, index) => (
-                            <Grid item xs={12} key={index}>
-                                <Paper
-                                    className={`flex items-center justify-between p-4 rounded-xl transition-all duration-300 ${
-                                        item.completed
-                                            ? "bg-green-100"
-                                            : "bg-white"
-                                    }`}
-                                    elevation={1}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <Checkbox
-                                            checked={item.completed}
-                                            onChange={() => toggleTask(index)}
-                                        />
-                                        <Typography
-                                            variant="body1"
-                                            className={`text-lg ${
-                                                item.completed
-                                                    ? "line-through text-gray-400"
-                                                    : "text-gray-800"
-                                            }`}
-                                        >
-                                            {item.text}
-                                        </Typography>
-                                    </div>
-                                    <Button
-                                        size="small"
-                                        variant="outlined"
-                                        color="error"
-                                        onClick={() => handleDeleteTask(index)}
-                                    >
-                                        Delete
-                                    </Button>
-                                </Paper>
-                            </Grid>
+                        {["all", "active", "completed"].map((key) => (
+                            <Button
+                                key={key}
+                                variant={
+                                    filter === key ? "contained" : "outlined"
+                                }
+                                size="small"
+                                onClick={() => setFilter(key)}
+                            >
+                                {key.charAt(0).toUpperCase() + key.slice(1)}
+                            </Button>
                         ))}
-                    </AnimatePresence>
-                </Grid>
+                    </Box>
+
+                    <Divider />
+
+                    {/* Tasks List */}
+                    <Grid container spacing={2}>
+                        {filteredTasks.length ? (
+                            <AnimatePresence>
+                                {filteredTasks.map((item, index) => (
+                                    <Grid item xs={12} key={index}>
+                                        <Paper
+                                            component={motion.div}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -10 }}
+                                            transition={{ duration: 0.3 }}
+                                            sx={{
+                                                p: 2,
+                                                borderRadius: 2,
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "space-between",
+                                                backgroundColor: item.completed
+                                                    ? "#e7f9ed"
+                                                    : "#ffffff",
+                                                boxShadow: 1,
+                                            }}
+                                        >
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: 2,
+                                                }}
+                                            >
+                                                <Checkbox
+                                                    checked={item.completed}
+                                                    onChange={() =>
+                                                        toggleTask(index)
+                                                    }
+                                                />
+                                                <Typography
+                                                    variant="body1"
+                                                    noWrap
+                                                    sx={{
+                                                        textDecoration:
+                                                            item.completed
+                                                                ? "line-through"
+                                                                : "none",
+                                                        color: item.completed
+                                                            ? "text.secondary"
+                                                            : "text.primary",
+                                                    }}
+                                                >
+                                                    {item.text}
+                                                </Typography>
+                                            </Box>
+                                            <Button
+                                                size="small"
+                                                variant="outlined"
+                                                color="error"
+                                                onClick={() =>
+                                                    handleDeleteTask(index)
+                                                }
+                                            >
+                                                Delete
+                                            </Button>
+                                        </Paper>
+                                    </Grid>
+                                ))}
+                            </AnimatePresence>
+                        ) : (
+                            <Grid item xs={12}>
+                                <Typography
+                                    variant="body2"
+                                    align="center"
+                                    color="text.secondary"
+                                >
+                                    No tasks to show
+                                </Typography>
+                            </Grid>
+                        )}
+                    </Grid>
+                </Stack>
             </Paper>
 
             {/* Toast Notification */}
@@ -198,6 +257,7 @@ export default function TodoList({ listId, onDeleteList, onTaskComplete }) {
                 open={openToast}
                 autoHideDuration={2000}
                 onClose={() => setOpenToast(false)}
+                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
             >
                 <Alert
                     onClose={() => setOpenToast(false)}

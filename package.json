@@ -13,6 +13,8 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.1.0",
+    "@mui/x-date-pickers": "^8.5.0",
+    "dayjs": "^1.11.13",
     "framer-motion": "^12.11.3",
     "next": "15.3.2",
     "react": "^19.0.0",
