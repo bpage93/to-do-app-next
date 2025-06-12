@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Paper,
     TextField,
@@ -34,6 +34,26 @@ export default function TodoList({ listId, onDeleteList, onTaskComplete }) {
     const [openToast, setOpenToast] = useState(false);
     const [completedMessage, setCompletedMessage] = useState("");
 
+    const storageKey = `todo-list-${listId}`;
+
+    // Load tasks & title from localStorage on mount
+    useEffect(() => {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                setTasks(parsed.tasks || []);
+                setTitle(parsed.title || "Untitled List");
+            } catch {}
+        }
+    }, [storageKey]);
+
+    // Save tasks & title to localStorage whenever they change
+    useEffect(() => {
+        const toSave = { tasks, title };
+        localStorage.setItem(storageKey, JSON.stringify(toSave));
+    }, [tasks, title, storageKey]);
+
     const handleAddTask = () => {
         if (!task.trim()) return;
         setTasks((prev) => [...prev, { text: task, completed: false }]);
@@ -54,7 +74,10 @@ export default function TodoList({ listId, onDeleteList, onTaskComplete }) {
             if (updated[index].completed) {
                 setCompletedMessage(`🎉 '${updated[index].text}' completed!`);
                 setOpenToast(true);
-                onTaskComplete?.(updated[index].text);
+                // Defer parent update
+                setTimeout(() => {
+                    onTaskComplete?.(updated[index].text);
+                }, 0);
             }
             return updated;
         });

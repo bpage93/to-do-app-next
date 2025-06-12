@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+    to-do-app:
+        image: to-do-app:latest
+        ports:
+            - 3000:3000
+        deploy:
+            replicas: 3
+    to-do-app-two:
+        image: to-do-app:latest
+        ports:
+            - 3001:3000
+        deploy:
+            replicas: 2

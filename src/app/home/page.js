@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Box, Grid } from "@mui/material";
 import Header from "@/components/Header";
@@ -14,14 +14,39 @@ export default function HomePage() {
     const [completedTasks, setCompletedTasks] = useState([]);
     const router = useRouter();
 
+    const STORAGE_KEY = "todo-app-state";
+
+    // Load saved state from localStorage on mount
+    useEffect(() => {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            try {
+                const {
+                    lists: savedLists,
+                    completedCount: savedCount,
+                    completedTasks: savedTasks,
+                } = JSON.parse(saved);
+                setLists(savedLists || []);
+                setCompletedCount(savedCount || 0);
+                setCompletedTasks(savedTasks || []);
+            } catch {}
+        }
+    }, []);
+
+    // Save state to localStorage whenever it changes
+    useEffect(() => {
+        const toSave = { lists, completedCount, completedTasks };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+    }, [lists, completedCount, completedTasks]);
+
     // Add a new list
     const handleAddNewList = () => {
-        setLists([...lists, Date.now()]);
+        setLists((prev) => [...prev, Date.now()]);
     };
 
     // Delete a single list
     const handleDeleteList = (idToDelete) => {
-        setLists(lists.filter((id) => id !== idToDelete));
+        setLists((prev) => prev.filter((id) => id !== idToDelete));
     };
 
     // Delete all lists and reset notifications
